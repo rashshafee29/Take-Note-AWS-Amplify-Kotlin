@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Take Note</string>
+    <string-array name="spinner_priority">
+        <item>----</item>
+        <item>LOW</item>
+        <item>NORMAL</item>
+        <item>HIGH</item>
+    </string-array>
 </resources>

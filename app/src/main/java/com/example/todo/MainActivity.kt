@@ -1,40 +1,109 @@
 package com.example.todo
 
-import android.R.attr
+import android.app.Dialog
+import android.content.Context
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.widget.*
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.amplifyframework.AmplifyException
 import com.amplifyframework.api.aws.AWSApiPlugin
 import com.amplifyframework.core.Amplify
-import com.amplifyframework.core.model.query.Where
 import com.amplifyframework.datastore.AWSDataStorePlugin
 import com.amplifyframework.datastore.generated.model.Priority
 import com.amplifyframework.datastore.generated.model.Todo
-import android.R.attr.value
-
-import android.R.attr.text
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MainActivity : AppCompatActivity() {
     private var TAG = "TODO-AWS"
     private lateinit var recyclerView: RecyclerView
     private lateinit var layoutManager: LinearLayoutManager
     private lateinit var todoListRecyclerViewAdapter: TodoListRecyclerViewAdapter
+    private lateinit var fabIcon: FloatingActionButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val todoList: ArrayList<Todo> = ArrayList()
+        fabIcon = findViewById(R.id.id_fab)
         recyclerView = findViewById(R.id.id_recycler_view)
         layoutManager = LinearLayoutManager(applicationContext)
         recyclerView.layoutManager = layoutManager
         todoListRecyclerViewAdapter = TodoListRecyclerViewAdapter(applicationContext, todoList)
         recyclerView.adapter = todoListRecyclerViewAdapter
+
+        fabIcon.setOnClickListener {
+            showTodoForm(this)
+        }
         configureAmplify()
-//        createTodoItem()
         queryTodoList()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.todo_menu, menu)
+        val searchItem: MenuItem = menu!!.findItem(R.id.id_search_button)
+        val searchView = searchItem.actionView as SearchView
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                todoListRecyclerViewAdapter.filter.filter(newText)
+                return false
+            }
+        })
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+//            R.id.id_search_button -> showTodoForm(this)
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun showTodoForm(context: Context) {
+        val dialog = Dialog(context)
+        dialog.setCancelable(true)
+        dialog.setContentView(R.layout.dialog_todo_form)
+        dialog.setCanceledOnTouchOutside(true)
+        dialog.show()
+
+        val todoTitle: EditText = dialog.findViewById(R.id.id_task_name)
+        val todoDesc: EditText = dialog.findViewById(R.id.id_task_description)
+        val todoPriority: Spinner = dialog.findViewById(R.id.id_pr_spinner)
+        val errorText: TextView = dialog.findViewById(R.id.id_error_text)
+        errorText.visibility = View.GONE
+
+        val okayBtn = dialog.findViewById<Button>(R.id.id_dialog_btn_okay)
+        val cancelBtn = dialog.findViewById<Button>(R.id.id_dialog_btn_cancel)
+        okayBtn.setBackgroundColor(ContextCompat.getColor(context, R.color.teal_700))
+        cancelBtn.setBackgroundColor(ContextCompat.getColor(context, R.color.high_pr))
+
+        okayBtn.setOnClickListener {
+            if (todoTitle.text.toString().isEmpty() || todoDesc.text.toString().isEmpty()) {
+                errorText.visibility = View.VISIBLE
+            } else {
+                errorText.visibility = View.GONE
+                createTodoItem(
+                    todoTitle.text.toString(),
+                    todoDesc.text.toString(),
+                    todoPriority.selectedItem.toString()
+                )
+                dialog.dismiss()
+                queryTodoList()
+            }
+        }
+        cancelBtn.setOnClickListener { dialog.dismiss() }
     }
 
     private fun configureAmplify() {
@@ -57,33 +126,39 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun queryTodoList() {
-            Amplify.DataStore.query(Todo::class.java,
+        val todoList: ArrayList<Todo> = ArrayList()
+        Amplify.DataStore.query(Todo::class.java,
             { todos ->
                 while (todos.hasNext()) {
                     val todo: Todo = todos.next()
-                    runOnUiThread{
-                        todoListRecyclerViewAdapter.updateData(todo)
-                    }
+                    todoList.add(todo)
                     Log.i(TAG, "==== Todo ====")
                     Log.i(TAG, "Name: ${todo.name}")
                     Log.i(TAG, "Priority: ${todo.priority}")
                     Log.i(TAG, "Description: ${todo.description}")
                 }
+                todoList.reverse()
+                runOnUiThread {
+                    todoListRecyclerViewAdapter.setData(todoList)
+                }
             },
-            { Log.e(TAG, "Could not query DataStore", it)  }
+            { Log.e(TAG, "Could not query DataStore", it) }
         )
     }
 
-    private fun createTodoItem() {
-//        val todoItem = Todo.builder()
-//            .name("First todo")
-//            .description("First khela")
-//            .build()
+    private fun createTodoItem(todoName: String, todoDesc: String, todoPr: String) {
+        val priority: Priority? = when (todoPr) {
+            "LOW" -> Priority.LOW
+            "NORMAL" -> Priority.NORMAL
+            "HIGH" -> Priority.HIGH
+            else -> null
+        }
         val todoItem = Todo.builder()
-            .name("Second todo")
-            .priority(Priority.LOW)
-            .description("Second khela")
+            .name(todoName)
+            .priority(priority)
+            .description(todoDesc)
             .build()
+
         storeData(todoItem)
     }
 
@@ -93,6 +168,4 @@ class MainActivity : AppCompatActivity() {
             { Log.e(TAG, "Could not save item to DataStore", it) }
         )
     }
-
-
 }
