@@ -1,18 +1,21 @@
 package com.example.todo
 
+import android.app.Dialog
 import android.content.Context
 import android.graphics.DrawFilter
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.graphics.drawable.Drawable
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Filter
-import android.widget.Filterable
-import android.widget.TextView
+import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.amazonaws.mobile.auth.core.internal.util.ThreadUtils.runOnUiThread
+import com.amplifyframework.core.Amplify
+import com.amplifyframework.core.model.query.Where
 import com.amplifyframework.datastore.generated.model.Priority
 import com.amplifyframework.datastore.generated.model.Todo
 import java.util.*
@@ -31,6 +34,8 @@ class TodoListRecyclerViewAdapter(private var context: Context, private var mTod
         val todoTitle: TextView = itemView.findViewById(R.id.id_todo_title)
         val todoPriority: TextView = itemView.findViewById(R.id.id_todo_priority)
         val todoDescription: TextView = itemView.findViewById(R.id.id_todo_description)
+        val editButton: ImageView = itemView.findViewById(R.id.id_edit)
+        val deleteButton: ImageView = itemView.findViewById(R.id.id_delete)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TodoListViewHolder {
@@ -66,15 +71,99 @@ class TodoListRecyclerViewAdapter(private var context: Context, private var mTod
             holder.todoPriority.text = mTodoList[position].priority.toString()
         }
         holder.todoDescription.text = mTodoList[position].description.toString()
+
+        holder.editButton.setOnClickListener {
+            showEditDialog(context, position)
+        }
+
+        holder.deleteButton.setOnClickListener {
+            Amplify.DataStore.query(Todo::class.java, Where.id(mTodoList[position].id),
+                { matches ->
+                    if (matches.hasNext()) {
+                        val todo = matches.next()
+                        Amplify.DataStore.delete(todo,
+                            { Log.i("TODO-Delete", "Deleted a todo.") },
+                            { Log.e("TODO-Delete", "Delete failed.", it) }
+                        )
+                    }
+                },
+                { Log.e("TODO-Delete", "Query failed.", it) }
+            )
+            notifyItemRemoved(position)
+        }
+    }
+
+    private fun updateTodo(position: Int, editedTitle: String, editedDesc: String, editedPr: String) {
+        var editedTodo: Todo
+        val priority: Priority? = when (editedPr) {
+            "LOW" -> Priority.LOW
+            "NORMAL" -> Priority.NORMAL
+            "HIGH" -> Priority.HIGH
+            else -> null
+        }
+        Amplify.DataStore.query(Todo::class.java, Where.id(mTodoList[position].id),
+            { matches ->
+                if (matches.hasNext()) {
+                    val todo = matches.next()
+                    editedTodo = todo.copyOfBuilder()
+                        .name(editedTitle)
+                        .description(editedDesc)
+                        .priority(priority)
+                        .build()
+                    runOnUiThread{
+                        mTodoList[position] = editedTodo
+                        notifyItemChanged(position)
+                    }
+                    Amplify.DataStore.save(editedTodo,
+                        { Log.i("TODO-Edit", "Edit a todo.") },
+                        { Log.e("TODO-Edit", "Edit failed.", it) }
+                    )
+                }
+            },
+            { Log.e("TODO-Edit", "Query failed.", it) }
+        )
+    }
+
+    private fun showEditDialog(context: Context, position: Int) {
+        val dialog = Dialog(context)
+        dialog.setCancelable(true)
+        dialog.setContentView(R.layout.dialog_todo_form)
+        dialog.setCanceledOnTouchOutside(true)
+        dialog.show()
+
+        val todoTitle: EditText = dialog.findViewById(R.id.id_task_name)
+        val todoDesc: EditText = dialog.findViewById(R.id.id_task_description)
+        val todoPriority: Spinner = dialog.findViewById(R.id.id_pr_spinner)
+        val errorText: TextView = dialog.findViewById(R.id.id_error_text)
+        errorText.visibility = View.GONE
+
+        todoTitle.setText(mTodoList[position].name)
+        todoDesc.setText(mTodoList[position].description)
+        todoPriority.setSelection(mTodoList[position].priority.ordinal + 1)
+
+
+        val okayBtn = dialog.findViewById<Button>(R.id.id_dialog_btn_okay)
+        val cancelBtn = dialog.findViewById<Button>(R.id.id_dialog_btn_cancel)
+        okayBtn.setBackgroundColor(ContextCompat.getColor(context, R.color.teal_700))
+        cancelBtn.setBackgroundColor(ContextCompat.getColor(context, R.color.high_pr))
+
+        okayBtn.setOnClickListener {
+            if (todoTitle.text.toString().isEmpty() || todoDesc.text.toString().isEmpty()) {
+                errorText.visibility = View.VISIBLE
+            } else {
+                errorText.visibility = View.GONE
+                updateTodo(position,
+                    todoTitle.text.toString(),
+                    todoDesc.text.toString(),
+                    todoPriority.selectedItem.toString())
+                dialog.dismiss()
+            }
+        }
+        cancelBtn.setOnClickListener { dialog.dismiss() }
     }
 
     override fun getItemCount(): Int {
         return mTodoList.size
-    }
-
-    fun updateData(todo: Todo) {
-        mTodoList.add(todo)
-        notifyItemInserted(mTodoList.size-1)
     }
 
     fun setData(todoList: ArrayList<Todo>) {
@@ -106,6 +195,7 @@ class TodoListRecyclerViewAdapter(private var context: Context, private var mTod
                 return filterResults
             }
 
+            @Suppress("UNCHECKED_CAST")
             override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
                 mTodoList.clear()
                 mTodoList.addAll(results?.values as ArrayList<Todo>)

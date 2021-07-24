@@ -2,7 +2,6 @@ package com.example.todo
 
 import android.app.Dialog
 import android.content.Context
-import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -36,7 +35,7 @@ class MainActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.id_recycler_view)
         layoutManager = LinearLayoutManager(applicationContext)
         recyclerView.layoutManager = layoutManager
-        todoListRecyclerViewAdapter = TodoListRecyclerViewAdapter(applicationContext, todoList)
+        todoListRecyclerViewAdapter = TodoListRecyclerViewAdapter(this, todoList)
         recyclerView.adapter = todoListRecyclerViewAdapter
 
         fabIcon.setOnClickListener {
@@ -62,13 +61,6 @@ class MainActivity : AppCompatActivity() {
             }
         })
         return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-//            R.id.id_search_button -> showTodoForm(this)
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     private fun showTodoForm(context: Context) {
