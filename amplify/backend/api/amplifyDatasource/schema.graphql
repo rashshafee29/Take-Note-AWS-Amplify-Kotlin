@@ -4,9 +4,16 @@ enum Priority {
   HIGH
 }
 
-type Todo @model {
+type User @model  @auth(rules: [{allow: owner, operations: [create, delete, update]}]) {
+    id: ID!
+    name: String
+    takeNote: [TakeNote] @connection(name: "UserTodos")
+}
+
+type TakeNote @model {
   id: ID!
   name: String!
   priority: Priority
   description: String
+  user: User @connection (name: "UserTodos")
 }

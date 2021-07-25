@@ -1,7 +1,7 @@
 package com.amplifyframework.datastore.generated.model;
 
-import com.amplifyframework.core.model.temporal.Temporal;
 import com.amplifyframework.core.model.annotations.BelongsTo;
+import com.amplifyframework.core.model.temporal.Temporal;
 
 import java.util.List;
 import java.util.UUID;
@@ -17,22 +17,20 @@ import com.amplifyframework.core.model.query.predicate.QueryField;
 
 import static com.amplifyframework.core.model.query.predicate.QueryField.field;
 
-/** This is an auto generated class representing the Todo type in your schema. */
+/** This is an auto generated class representing the TakeNote type in your schema. */
 @SuppressWarnings("all")
-@ModelConfig(pluralName = "Todos")
-public final class Todo implements Model {
-  public static final QueryField ID = field("Todo", "id");
-  public static final QueryField NAME = field("Todo", "name");
-  public static final QueryField PRIORITY = field("Todo", "priority");
-  public static final QueryField DESCRIPTION = field("Todo", "description");
-  public static final QueryField DATE = field("Todo", "date");
-  public static final QueryField USER = field("Todo", "todoUserId");
+@ModelConfig(pluralName = "TakeNotes")
+public final class TakeNote implements Model {
+  public static final QueryField ID = field("TakeNote", "id");
+  public static final QueryField NAME = field("TakeNote", "name");
+  public static final QueryField PRIORITY = field("TakeNote", "priority");
+  public static final QueryField DESCRIPTION = field("TakeNote", "description");
+  public static final QueryField USER = field("TakeNote", "takeNoteUserId");
   private final @ModelField(targetType="ID", isRequired = true) String id;
   private final @ModelField(targetType="String", isRequired = true) String name;
   private final @ModelField(targetType="Priority") Priority priority;
   private final @ModelField(targetType="String") String description;
-  private final @ModelField(targetType="AWSDateTime") Temporal.DateTime date;
-  private final @ModelField(targetType="User") @BelongsTo(targetName = "todoUserId", type = User.class) User user;
+  private final @ModelField(targetType="User") @BelongsTo(targetName = "takeNoteUserId", type = User.class) User user;
   private @ModelField(targetType="AWSDateTime", isReadOnly = true) Temporal.DateTime createdAt;
   private @ModelField(targetType="AWSDateTime", isReadOnly = true) Temporal.DateTime updatedAt;
   public String getId() {
@@ -51,10 +49,6 @@ public final class Todo implements Model {
       return description;
   }
   
-  public Temporal.DateTime getDate() {
-      return date;
-  }
-  
   public User getUser() {
       return user;
   }
@@ -67,12 +61,11 @@ public final class Todo implements Model {
       return updatedAt;
   }
   
-  private Todo(String id, String name, Priority priority, String description, Temporal.DateTime date, User user) {
+  private TakeNote(String id, String name, Priority priority, String description, User user) {
     this.id = id;
     this.name = name;
     this.priority = priority;
     this.description = description;
-    this.date = date;
     this.user = user;
   }
   
@@ -83,15 +76,14 @@ public final class Todo implements Model {
       } else if(obj == null || getClass() != obj.getClass()) {
         return false;
       } else {
-      Todo todo = (Todo) obj;
-      return ObjectsCompat.equals(getId(), todo.getId()) &&
-              ObjectsCompat.equals(getName(), todo.getName()) &&
-              ObjectsCompat.equals(getPriority(), todo.getPriority()) &&
-              ObjectsCompat.equals(getDescription(), todo.getDescription()) &&
-              ObjectsCompat.equals(getDate(), todo.getDate()) &&
-              ObjectsCompat.equals(getUser(), todo.getUser()) &&
-              ObjectsCompat.equals(getCreatedAt(), todo.getCreatedAt()) &&
-              ObjectsCompat.equals(getUpdatedAt(), todo.getUpdatedAt());
+      TakeNote takeNote = (TakeNote) obj;
+      return ObjectsCompat.equals(getId(), takeNote.getId()) &&
+              ObjectsCompat.equals(getName(), takeNote.getName()) &&
+              ObjectsCompat.equals(getPriority(), takeNote.getPriority()) &&
+              ObjectsCompat.equals(getDescription(), takeNote.getDescription()) &&
+              ObjectsCompat.equals(getUser(), takeNote.getUser()) &&
+              ObjectsCompat.equals(getCreatedAt(), takeNote.getCreatedAt()) &&
+              ObjectsCompat.equals(getUpdatedAt(), takeNote.getUpdatedAt());
       }
   }
   
@@ -102,7 +94,6 @@ public final class Todo implements Model {
       .append(getName())
       .append(getPriority())
       .append(getDescription())
-      .append(getDate())
       .append(getUser())
       .append(getCreatedAt())
       .append(getUpdatedAt())
@@ -113,12 +104,11 @@ public final class Todo implements Model {
   @Override
    public String toString() {
     return new StringBuilder()
-      .append("Todo {")
+      .append("TakeNote {")
       .append("id=" + String.valueOf(getId()) + ", ")
       .append("name=" + String.valueOf(getName()) + ", ")
       .append("priority=" + String.valueOf(getPriority()) + ", ")
       .append("description=" + String.valueOf(getDescription()) + ", ")
-      .append("date=" + String.valueOf(getDate()) + ", ")
       .append("user=" + String.valueOf(getUser()) + ", ")
       .append("createdAt=" + String.valueOf(getCreatedAt()) + ", ")
       .append("updatedAt=" + String.valueOf(getUpdatedAt()))
@@ -139,7 +129,7 @@ public final class Todo implements Model {
    * @return an instance of this model with only ID populated
    * @throws IllegalArgumentException Checks that ID is in the proper format
    */
-  public static Todo justId(String id) {
+  public static TakeNote justId(String id) {
     try {
       UUID.fromString(id); // Check that ID is in the UUID format - if not an exception is thrown
     } catch (Exception exception) {
@@ -149,9 +139,8 @@ public final class Todo implements Model {
               "creating a new object, use the standard builder method and leave the ID field blank."
       );
     }
-    return new Todo(
+    return new TakeNote(
       id,
-      null,
       null,
       null,
       null,
@@ -164,7 +153,6 @@ public final class Todo implements Model {
       name,
       priority,
       description,
-      date,
       user);
   }
   public interface NameStep {
@@ -173,11 +161,10 @@ public final class Todo implements Model {
   
 
   public interface BuildStep {
-    Todo build();
+    TakeNote build();
     BuildStep id(String id) throws IllegalArgumentException;
     BuildStep priority(Priority priority);
     BuildStep description(String description);
-    BuildStep date(Temporal.DateTime date);
     BuildStep user(User user);
   }
   
@@ -187,18 +174,16 @@ public final class Todo implements Model {
     private String name;
     private Priority priority;
     private String description;
-    private Temporal.DateTime date;
     private User user;
     @Override
-     public Todo build() {
+     public TakeNote build() {
         String id = this.id != null ? this.id : UUID.randomUUID().toString();
         
-        return new Todo(
+        return new TakeNote(
           id,
           name,
           priority,
           description,
-          date,
           user);
     }
     
@@ -218,12 +203,6 @@ public final class Todo implements Model {
     @Override
      public BuildStep description(String description) {
         this.description = description;
-        return this;
-    }
-    
-    @Override
-     public BuildStep date(Temporal.DateTime date) {
-        this.date = date;
         return this;
     }
     
@@ -256,12 +235,11 @@ public final class Todo implements Model {
   
 
   public final class CopyOfBuilder extends Builder {
-    private CopyOfBuilder(String id, String name, Priority priority, String description, Temporal.DateTime date, User user) {
+    private CopyOfBuilder(String id, String name, Priority priority, String description, User user) {
       super.id(id);
       super.name(name)
         .priority(priority)
         .description(description)
-        .date(date)
         .user(user);
     }
     
@@ -278,11 +256,6 @@ public final class Todo implements Model {
     @Override
      public CopyOfBuilder description(String description) {
       return (CopyOfBuilder) super.description(description);
-    }
-    
-    @Override
-     public CopyOfBuilder date(Temporal.DateTime date) {
-      return (CopyOfBuilder) super.date(date);
     }
     
     @Override
