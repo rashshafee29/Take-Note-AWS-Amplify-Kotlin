@@ -2,7 +2,6 @@ package com.example.todo
 
 import android.app.Dialog
 import android.content.Context
-import android.graphics.DrawFilter
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.graphics.drawable.Drawable
@@ -17,15 +16,16 @@ import com.amazonaws.mobile.auth.core.internal.util.ThreadUtils.runOnUiThread
 import com.amplifyframework.core.Amplify
 import com.amplifyframework.core.model.query.Where
 import com.amplifyframework.datastore.generated.model.Priority
-import com.amplifyframework.datastore.generated.model.Todo
+import com.amplifyframework.datastore.generated.model.TakeNote
+import com.amplifyframework.datastore.generated.model.User
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.coroutines.coroutineContext
 
-class TodoListRecyclerViewAdapter(private var context: Context, private var mTodoList: ArrayList<Todo>)
+class TodoListRecyclerViewAdapter(private var context: Context, private var mTodoList: ArrayList<TakeNote>)
     : RecyclerView.Adapter<TodoListRecyclerViewAdapter.TodoListViewHolder>(), Filterable {
-    private var mFullTodoList: ArrayList<Todo>
+    private var mFullTodoList: ArrayList<TakeNote>
 
+    private var TAG = "Dota2Same"
     init {
         mFullTodoList = ArrayList(mTodoList)
     }
@@ -77,50 +77,52 @@ class TodoListRecyclerViewAdapter(private var context: Context, private var mTod
         }
 
         holder.deleteButton.setOnClickListener {
-            Amplify.DataStore.query(Todo::class.java, Where.id(mTodoList[position].id),
+            Amplify.DataStore.query(TakeNote::class.java, Where.matches(TakeNote.ID.eq(mTodoList[position].id)),
                 { matches ->
                     if (matches.hasNext()) {
                         val todo = matches.next()
                         Amplify.DataStore.delete(todo,
-                            { Log.i("TODO-Delete", "Deleted a todo.") },
-                            { Log.e("TODO-Delete", "Delete failed.", it) }
+                            { Log.i(TAG, "Deleted a todo.") },
+                            { Log.e(TAG, "Delete failed.", it) }
                         )
                     }
                 },
-                { Log.e("TODO-Delete", "Query failed.", it) }
+                { Log.e(TAG, "Delete Query failed.", it) }
             )
+            mTodoList.remove(mTodoList[position])
             notifyItemRemoved(position)
         }
     }
 
     private fun updateTodo(position: Int, editedTitle: String, editedDesc: String, editedPr: String) {
-        var editedTodo: Todo
+        var editedTodo: TakeNote
         val priority: Priority? = when (editedPr) {
             "LOW" -> Priority.LOW
             "NORMAL" -> Priority.NORMAL
             "HIGH" -> Priority.HIGH
             else -> null
         }
-        Amplify.DataStore.query(Todo::class.java, Where.id(mTodoList[position].id),
+        val currUser = Amplify.Auth.currentUser
+        Amplify.DataStore.query(TakeNote::class.java, Where.matches(TakeNote.ID.eq(mTodoList[position].id)),
             { matches ->
                 if (matches.hasNext()) {
                     val todo = matches.next()
                     editedTodo = todo.copyOfBuilder()
                         .name(editedTitle)
                         .description(editedDesc)
-                        .priority(priority)
+                        .priority(priority).user(User.justId(currUser.userId))
                         .build()
                     runOnUiThread{
                         mTodoList[position] = editedTodo
                         notifyItemChanged(position)
                     }
                     Amplify.DataStore.save(editedTodo,
-                        { Log.i("TODO-Edit", "Edit a todo.") },
-                        { Log.e("TODO-Edit", "Edit failed.", it) }
+                        { Log.i(TAG, "Edit a todo.") },
+                        { Log.e(TAG, "Edit failed.", it) }
                     )
                 }
             },
-            { Log.e("TODO-Edit", "Query failed.", it) }
+            { Log.e(TAG, "Edit Query failed.", it) }
         )
     }
 
@@ -139,7 +141,11 @@ class TodoListRecyclerViewAdapter(private var context: Context, private var mTod
 
         todoTitle.setText(mTodoList[position].name)
         todoDesc.setText(mTodoList[position].description)
-        todoPriority.setSelection(mTodoList[position].priority.ordinal + 1)
+        if (mTodoList[position].priority == null) {
+            todoPriority.setSelection(0)
+        } else {
+            todoPriority.setSelection(mTodoList[position].priority.ordinal + 1)
+        }
 
 
         val okayBtn = dialog.findViewById<Button>(R.id.id_dialog_btn_okay)
@@ -166,18 +172,23 @@ class TodoListRecyclerViewAdapter(private var context: Context, private var mTod
         return mTodoList.size
     }
 
-    fun setData(todoList: ArrayList<Todo>) {
+    fun setData(todoList: ArrayList<TakeNote>) {
         mTodoList = todoList
+        mTodoList.reverse()
         mFullTodoList.clear()
         mFullTodoList = ArrayList(mTodoList)
         notifyItemRangeChanged(0, mTodoList.size - 1)
+    }
+
+    fun getData(): ArrayList<TakeNote> {
+        return mTodoList
     }
 
     override fun getFilter(): Filter {
         return object : Filter() {
             override fun performFiltering(constraint: CharSequence?): FilterResults {
                 val searchString = constraint.toString()
-                val searchTodoList = ArrayList<Todo>()
+                val searchTodoList = ArrayList<TakeNote>()
 
                 if (constraint == null || constraint.isEmpty()) {
                     searchTodoList.addAll(mFullTodoList)
@@ -198,7 +209,7 @@ class TodoListRecyclerViewAdapter(private var context: Context, private var mTod
             @Suppress("UNCHECKED_CAST")
             override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
                 mTodoList.clear()
-                mTodoList.addAll(results?.values as ArrayList<Todo>)
+                mTodoList.addAll(results?.values as ArrayList<TakeNote>)
                 notifyDataSetChanged()
             }
 

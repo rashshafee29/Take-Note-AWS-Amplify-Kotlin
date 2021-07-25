@@ -1,10 +1,105 @@
 # this is an auto generated file. This will be overwritten
-subscription OnCreateTodo {
-  onCreateTodo {
+subscription OnCreateUser {
+  onCreateUser {
+    id
+    name
+    takeNote {
+      items {
+        id
+        name
+        priority
+        description
+        _version
+        _deleted
+        _lastChangedAt
+        createdAt
+        updatedAt
+      }
+      nextToken
+      startedAt
+    }
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+    owner
+  }
+}
+subscription OnUpdateUser {
+  onUpdateUser {
+    id
+    name
+    takeNote {
+      items {
+        id
+        name
+        priority
+        description
+        _version
+        _deleted
+        _lastChangedAt
+        createdAt
+        updatedAt
+      }
+      nextToken
+      startedAt
+    }
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+    owner
+  }
+}
+subscription OnDeleteUser {
+  onDeleteUser {
+    id
+    name
+    takeNote {
+      items {
+        id
+        name
+        priority
+        description
+        _version
+        _deleted
+        _lastChangedAt
+        createdAt
+        updatedAt
+      }
+      nextToken
+      startedAt
+    }
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+    owner
+  }
+}
+subscription OnCreateTakeNote {
+  onCreateTakeNote {
     id
     name
     priority
     description
+    user {
+      id
+      name
+      takeNote {
+        nextToken
+        startedAt
+      }
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+      owner
+    }
     _version
     _deleted
     _lastChangedAt
@@ -12,12 +107,26 @@ subscription OnCreateTodo {
     updatedAt
   }
 }
-subscription OnUpdateTodo {
-  onUpdateTodo {
+subscription OnUpdateTakeNote {
+  onUpdateTakeNote {
     id
     name
     priority
     description
+    user {
+      id
+      name
+      takeNote {
+        nextToken
+        startedAt
+      }
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+      owner
+    }
     _version
     _deleted
     _lastChangedAt
@@ -25,12 +134,26 @@ subscription OnUpdateTodo {
     updatedAt
   }
 }
-subscription OnDeleteTodo {
-  onDeleteTodo {
+subscription OnDeleteTakeNote {
+  onDeleteTakeNote {
     id
     name
     priority
     description
+    user {
+      id
+      name
+      takeNote {
+        nextToken
+        startedAt
+      }
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+      owner
+    }
     _version
     _deleted
     _lastChangedAt

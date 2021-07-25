@@ -5,12 +5,12 @@
     android:layout_height="match_parent"
     android:background="#f5f6fa"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".TodoListActivity">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/id_recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="match_parent" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/id_fab"

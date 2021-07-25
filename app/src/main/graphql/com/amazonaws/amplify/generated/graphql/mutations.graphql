@@ -1,13 +1,117 @@
 # this is an auto generated file. This will be overwritten
-mutation CreateTodo(
-  $input: CreateTodoInput!
-  $condition: ModelTodoConditionInput
+mutation CreateUser(
+  $input: CreateUserInput!
+  $condition: ModelUserConditionInput
 ) {
-  createTodo(input: $input, condition: $condition) {
+  createUser(input: $input, condition: $condition) {
+    id
+    name
+    takeNote {
+      items {
+        id
+        name
+        priority
+        description
+        _version
+        _deleted
+        _lastChangedAt
+        createdAt
+        updatedAt
+      }
+      nextToken
+      startedAt
+    }
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+    owner
+  }
+}
+mutation UpdateUser(
+  $input: UpdateUserInput!
+  $condition: ModelUserConditionInput
+) {
+  updateUser(input: $input, condition: $condition) {
+    id
+    name
+    takeNote {
+      items {
+        id
+        name
+        priority
+        description
+        _version
+        _deleted
+        _lastChangedAt
+        createdAt
+        updatedAt
+      }
+      nextToken
+      startedAt
+    }
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+    owner
+  }
+}
+mutation DeleteUser(
+  $input: DeleteUserInput!
+  $condition: ModelUserConditionInput
+) {
+  deleteUser(input: $input, condition: $condition) {
+    id
+    name
+    takeNote {
+      items {
+        id
+        name
+        priority
+        description
+        _version
+        _deleted
+        _lastChangedAt
+        createdAt
+        updatedAt
+      }
+      nextToken
+      startedAt
+    }
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+    owner
+  }
+}
+mutation CreateTakeNote(
+  $input: CreateTakeNoteInput!
+  $condition: ModelTakeNoteConditionInput
+) {
+  createTakeNote(input: $input, condition: $condition) {
     id
     name
     priority
     description
+    user {
+      id
+      name
+      takeNote {
+        nextToken
+        startedAt
+      }
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+      owner
+    }
     _version
     _deleted
     _lastChangedAt
@@ -15,15 +119,29 @@ mutation CreateTodo(
     updatedAt
   }
 }
-mutation UpdateTodo(
-  $input: UpdateTodoInput!
-  $condition: ModelTodoConditionInput
+mutation UpdateTakeNote(
+  $input: UpdateTakeNoteInput!
+  $condition: ModelTakeNoteConditionInput
 ) {
-  updateTodo(input: $input, condition: $condition) {
+  updateTakeNote(input: $input, condition: $condition) {
     id
     name
     priority
     description
+    user {
+      id
+      name
+      takeNote {
+        nextToken
+        startedAt
+      }
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+      owner
+    }
     _version
     _deleted
     _lastChangedAt
@@ -31,15 +149,29 @@ mutation UpdateTodo(
     updatedAt
   }
 }
-mutation DeleteTodo(
-  $input: DeleteTodoInput!
-  $condition: ModelTodoConditionInput
+mutation DeleteTakeNote(
+  $input: DeleteTakeNoteInput!
+  $condition: ModelTakeNoteConditionInput
 ) {
-  deleteTodo(input: $input, condition: $condition) {
+  deleteTakeNote(input: $input, condition: $condition) {
     id
     name
     priority
     description
+    user {
+      id
+      name
+      takeNote {
+        nextToken
+        startedAt
+      }
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+      owner
+    }
     _version
     _deleted
     _lastChangedAt
