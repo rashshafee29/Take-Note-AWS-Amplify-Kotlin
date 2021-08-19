@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 class TodoListActivity : AppCompatActivity() {
-    private var TAG = "Dota2Same"
+    private var TAG = "TodoListActivity-Dota"
     private lateinit var recyclerView: RecyclerView
     private lateinit var layoutManager: LinearLayoutManager
     private lateinit var todoListRecyclerViewAdapter: TodoListRecyclerViewAdapter
@@ -41,9 +41,12 @@ class TodoListActivity : AppCompatActivity() {
     private fun syncCloud() {
         Amplify.DataStore.observe(
             TakeNote::class.java,
-            { Log.i(TAG, "Observation began.") },
+            {   //queryTodoList()
+                Log.i(TAG, "Observation began.")
+            },
             {
-                Log.i(TAG, it.item().toString())
+                queryTodoList()
+                Log.i(TAG, "syncCloud-> " + it.item().toString())
             },
             { Log.e(TAG, "Observation failed.", it) },
             {
@@ -112,7 +115,7 @@ class TodoListActivity : AppCompatActivity() {
                     todoDesc.text.toString(),
                     todoPriority.selectedItem.toString()
                 )
-                queryTodoList()
+                //queryTodoList()
                 dialog.dismiss()
             }
         }
@@ -125,13 +128,14 @@ class TodoListActivity : AppCompatActivity() {
         Amplify.DataStore.query(
             TakeNote::class.java, Where.matches(TakeNote.USER.eq(currUser.userId)),
             { todos ->
+                Log.i(TAG, "todos.size(): " + todos.hasNext())
                 while (todos.hasNext()) {
                     val todo: TakeNote = todos.next()
                     todoList.add(todo)
-                    Log.i(TAG, "==== Todo ====")
-                    Log.i(TAG, "Name: ${todo.name}")
-                    Log.i(TAG, "Priority: ${todo.priority}")
-                    Log.i(TAG, "Description: ${todo.description}")
+                    Log.i(TAG, "queryTodoList ==== Todo ====")
+                    Log.i(TAG, "queryTodoList Name: ${todo.name}")
+                    Log.i(TAG, "queryTodoList Priority: ${todo.priority}")
+                    Log.i(TAG, "queryTodoList Description: ${todo.description}")
                 }
                 runOnUiThread {
                     todoListRecyclerViewAdapter.setData(todoList)
@@ -160,8 +164,8 @@ class TodoListActivity : AppCompatActivity() {
 
     private fun storeData(takeNoteItem: TakeNote) {
         Amplify.DataStore.save(takeNoteItem,
-            { Log.i(TAG, "Saved item: ${takeNoteItem.name}") },
-            { Log.e(TAG, "Could not save item to DataStore", it) }
+            { Log.i(TAG, "storeData-> Saved item: ${takeNoteItem.name}") },
+            { Log.e(TAG, "storeData-> Could not save item to DataStore", it) }
         )
     }
 }
