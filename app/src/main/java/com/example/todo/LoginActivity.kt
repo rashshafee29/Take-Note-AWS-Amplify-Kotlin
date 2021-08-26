@@ -15,12 +15,22 @@ import com.amplifyframework.core.Amplify
 
 import android.widget.EditText
 import com.amplifyframework.auth.AuthException
+import android.view.WindowManager
+
+import android.os.Build
+import android.view.Window
 
 
 class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+        supportActionBar!!.hide()
+        val w: Window = window
+        w.setFlags(
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+        )
     }
 
     fun onPressLogin(view: View?) {

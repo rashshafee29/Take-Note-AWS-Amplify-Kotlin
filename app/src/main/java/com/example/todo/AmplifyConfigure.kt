@@ -8,8 +8,6 @@ import com.amplifyframework.auth.cognito.AWSCognitoAuthPlugin
 import com.amplifyframework.core.Amplify
 import com.amplifyframework.datastore.AWSDataStorePlugin
 import com.amplifyframework.datastore.generated.model.AmplifyModelProvider
-import com.amplifyframework.datastore.generated.model.TakeNote
-import com.amplifyframework.datastore.generated.model.Todo
 
 class AmplifyConfigure: Application() {
 
