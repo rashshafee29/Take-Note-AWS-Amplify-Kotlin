@@ -2,6 +2,7 @@ package com.example.todo
 
 import android.app.Dialog
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -29,6 +30,8 @@ class TodoListActivity : AppCompatActivity() {
     private lateinit var layoutManager: LinearLayoutManager
     private lateinit var todoListRecyclerViewAdapter: TodoListRecyclerViewAdapter
     private lateinit var fabIcon: FloatingActionButton
+    private lateinit var profileIcon: FloatingActionButton
+    private lateinit var logoutIcon: FloatingActionButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +39,22 @@ class TodoListActivity : AppCompatActivity() {
         configureRecyclerView()
         queryTodoList()
         syncCloud()
+        profileIcon = findViewById(R.id.id_profile)
+        profileIcon.setOnClickListener {
+
+        }
+
+        logoutIcon = findViewById(R.id.id_log_out)
+        logoutIcon.setOnClickListener {
+            Amplify.Auth.signOut(
+                {
+                    val intent = Intent(applicationContext, LoginActivity::class.java)
+                    startActivity(intent)
+                },
+                {
+                    Toast.makeText(applicationContext, "Logout failed", Toast.LENGTH_SHORT).show()
+                } )
+        }
     }
 
     private fun syncCloud() {

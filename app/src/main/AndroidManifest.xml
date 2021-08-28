@@ -11,6 +11,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Todo">
         <activity
+            android:name=".ProfileActivity"
+            android:exported="true" />
+        <activity
             android:name=".EmailConfirmationActivity"
             android:exported="true" />
         <activity

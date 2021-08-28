@@ -18,6 +18,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
+        android:background="@drawable/text_box_bg"
         android:id="@+id/txtConfirmationCode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -35,7 +36,7 @@
         android:layout_height="43dp"
         android:layout_marginTop="32dp"
         android:layout_marginBottom="340dp"
-        android:background="@color/primary"
+        android:background="@drawable/text_box_bg"
         android:onClick="onConfirmButtonPressed"
         android:text="Confirm"
         android:textColor="#FFFFFF"

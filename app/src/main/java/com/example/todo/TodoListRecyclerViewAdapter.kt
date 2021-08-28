@@ -177,7 +177,7 @@ class TodoListRecyclerViewAdapter(private var context: Context, private var mTod
         mTodoList.reverse()
         mFullTodoList.clear()
         mFullTodoList = ArrayList(mTodoList)
-        notifyItemRangeChanged(0, mTodoList.size - 1)
+        notifyItemRangeChanged(0, mTodoList.size)
     }
 
     fun getData(): ArrayList<TakeNote> {

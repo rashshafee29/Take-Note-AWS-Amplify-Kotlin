@@ -19,6 +19,8 @@ import com.amplifyframework.auth.result.AuthSignUpResult
 import android.widget.EditText
 
 import android.view.View
+import android.view.Window
+import android.view.WindowManager
 import com.amplifyframework.auth.AuthException
 import com.amplifyframework.core.Consumer
 import com.amplifyframework.core.model.Model
@@ -29,6 +31,12 @@ class EmailConfirmationActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_email_confirmation)
+        supportActionBar!!.hide()
+        val w: Window = window
+        w.setFlags(
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+        )
     }
 
     fun onConfirmButtonPressed(view: View?) {
